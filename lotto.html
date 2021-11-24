@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title>로또추첨기</title>
+    <style>
+        .ball {
+            display: inline-block;
+            border: 1px solid black;
+            border-radius: 20px;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 20px;
+            text-align: center;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="result">추첨 결과는? </div>
+    <div id="bonus">보너스: </div>
+    <script>
+        const numCandidate = 45;
+        const numSelected = 6;
+        const candidate = Array(numCandidate).fill().map((v, i) => i + 1);
+        const suffle = Array(numSelected).fill().map((v, i) => {
+            const idx = Math.floor(Math.random() * candidate.length);
+            return candidate.splice(idx,1)[0];
+        });
+        const bonus = candidate[Math.floor(Math.random() * candidate.length)];
+
+        const $result = document.querySelector('#result');
+        const $bonus = document.querySelector('#bonus');
+
+        const ranC = () => Math.floor(Math.random() * 256);
+
+        const drawBall = (number, $parent) => {
+            const $ball = document.createElement('div');
+            $ball.className = 'ball';
+            $ball.textContent = number;
+            $ball.style.border = `1px solid rgb(${ranC()}, ${ranC()}, ${ranC()})`;
+            $parent.appendChild($ball);
+        };
+
+        suffle.sort((a,b) => a-b);
+
+        suffle.forEach((v, i) => setTimeout(() => drawBall(v, $result), (i + 1) * 300));
+        setTimeout(() => drawBall(bonus, $bonus), (numSelected + 1) * 300);
+
+        const abc = [1,2,3,4,5,6,7,8,9,10];
+        abc.forEach((v,i) => setTimeout(() => console.log(v),1000));
+
+
+    </script>
+</body>

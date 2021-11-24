@@ -1,0 +1,86 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>숫자야구</title>
+</head>
+
+<body>
+    <form id="form">
+        <input type="text" id="input">
+        <button>확인</button>
+    </form>
+    <div id="logs"></div>
+    <script>
+        const $input = document.querySelector('#input');
+        const $form = document.querySelector('#form');
+        const $logs = document.querySelector('#logs');
+
+        let candiNumbers;
+        let probNumbers;
+        let tries = [];
+
+        const initCandiNumbers = () => candiNumbers = [0,1,2,3,4,5,6,7,8,9];
+        const getProbNumbers = () =>{
+            initCandiNumbers();
+            probNumbers = [];
+            for(let i = 0; i < 4; i++){
+                let tempIdx = Math.floor(Math.random() * candiNumbers.length);
+                probNumbers.push(candiNumbers[tempIdx]);
+                candiNumbers.splice(tempIdx,1);
+            }
+        }
+
+        function init(){
+            getProbNumbers();
+            tries = [];
+            $logs.textContent='';
+        }
+
+        init();
+        console.log('abc');
+
+        function checkValidInput(input){
+            if(isNaN(Number(input))) return alert('숫자만 입력해주세요.');
+            if(input.length !== 4) return alert('4자리 숫자를 입력해주세요.');
+            if((new Set(input)).size !== 4) return alert('중복되지 않게 입력해주세요.');
+            if(tries.includes(input)) return alert('이미 시도한 값입니다.');
+            return true;
+        }
+
+        function handleGameOver(bWin){
+            if(bWin) alert('이겼습니다.');
+            else alert('10번 이내에 맞추지 못했습니다. 졌습니다.');
+            init();
+        }
+
+        function submit(){
+            const input = $input.value;
+            $input.value = '';
+            if(checkValidInput(input) !== true) return;
+
+            let strike = 0;
+            let ball = 0;
+
+            probNumbers.forEach((element,i) => {
+                const idx = input.indexOf(element);
+                if(idx === i) strike++;
+                else if(idx !== -1) ball++;
+            })
+            
+            $logs.append(`[${tries.length}]번째 - ${input} : ${strike} s ${ball} b`, document.createElement('br'));
+            tries.push(input);
+            
+            if(strike === 4) handleGameOver(true);
+            if(tries.length >= 10) handleGameOver(false);
+        }
+
+        $form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            submit();
+        })
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title>계산기</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        #result {
+            width: 180px;
+            height: 50px;
+            margin: 5px;
+            text-align: right
+        }
+
+        #operator {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            text-align: center
+        }
+
+        button {
+            width: 50px;
+            height: 50px;
+            margin: 5px
+        }
+    </style>
+</head>
+
+<!-- 계산기 버튼 구현 -->
+
+<body>
+    <input readonly id="operator">
+    <input readonly type="number" id="result" value='0'>
+    <div class="row">
+        <button id="num-7">7</button>
+        <button id="num-8">8</button>
+        <button id="num-9">9</button>
+        <button id="oper-plus">+</button>
+    </div>
+    <div class="row">
+        <button id="num-4">4</button>
+        <button id="num-5">5</button>
+        <button id="num-6">6</button>
+        <button id="oper-minus">-</button>
+    </div>
+    <div class="row">
+        <button id="num-1">1</button>
+        <button id="num-2">2</button>
+        <button id="num-3">3</button>
+        <button id="oper-divide">/</button>
+    </div>
+    <div class="row">
+        <button id="oper-clear">C</button>
+        <button id="num-0">0</button>
+        <button id="oper-calculate">=</button>
+        <button id="oper-multiply">x</button>
+    </div>
+    <script>
+
+        const $result = document.querySelector('#result');
+        const $operator = document.querySelector('#operator');
+        const state = {
+            oper: undefined,
+            value: 0,
+            cleared: 1,
+        }
+
+        const handleOperatorEvent = (key) => {
+            state.oper = key;
+            $operator.value = key;
+            state.value = Number($result.value);
+            state.cleared = 1;
+        }
+
+        const handleNumberEvent = (key) => {
+            if (state.cleared) {
+                $result.value = key;
+                console.log('bbbb', state.cleared);
+            }
+            else $result.value += key;
+            state.cleared = 0;
+        }
+
+        const handleCalcEvent = () => {
+            switch (state.oper) {
+                case '+':
+                    $result.value = state.value + Number($result.value);
+                    break;
+                case '-':
+                    $result.value = state.value - Number($result.value);
+                    break;
+                case '*':
+                case 'x':
+                    $result.value = state.value * Number($result.value);
+                    break;
+                case '/':
+                    $result.value = state.value / Number($result.value);
+                    break;
+            }
+            state.value = Number($result.value);
+            state.cleared = 1;
+        }
+
+        const handleClearEvent = () => {
+            state.oper = null;
+            state.value = 0;
+            state.cleared = 1;
+            $result.value = 0;
+            $operator.value = null;
+        }
+
+        const onCalcEvent = (key) => {
+            console.log(key);
+            if (key == 'Enter' || key == '=') handleCalcEvent();
+            if (key == '+' || key == '-' || key == '*' || key == 'x' || key == '/') handleOperatorEvent(key);
+            if ('0' <= key && key <= '9') handleNumberEvent(key);
+            if (key == 'c' || key == 'C' || key == 'Escape') handleClearEvent();
+        }
+
+        const onClickButton = (e) => onCalcEvent(e.target.textContent);
+
+        const aAllowedKeyWithoutNumber = ['c', '=', 'Enter', 'Escape', '+', '-', '*', '/'];
+
+        const isAllowedKey = (key) => {
+            if ('0' <= key && key <= '9') return true;
+            if (aAllowedKeyWithoutNumber.indexOf(key) !== -1) return true;
+            return false;
+        }
+
+        const onKeyUp = (e) => onCalcEvent(e.key);
+
+        document.querySelector('#num-0').addEventListener('click', onClickButton);
+        document.querySelector('#num-1').addEventListener('click', onClickButton);
+        document.querySelector('#num-2').addEventListener('click', onClickButton);
+        document.querySelector('#num-3').addEventListener('click', onClickButton);
+        document.querySelector('#num-4').addEventListener('click', onClickButton);
+        document.querySelector('#num-5').addEventListener('click', onClickButton);
+        document.querySelector('#num-6').addEventListener('click', onClickButton);
+        document.querySelector('#num-7').addEventListener('click', onClickButton);
+        document.querySelector('#num-8').addEventListener('click', onClickButton);
+        document.querySelector('#num-9').addEventListener('click', onClickButton);
+        document.querySelector('#oper-plus').addEventListener('click', onClickButton);
+        document.querySelector('#oper-minus').addEventListener('click', onClickButton);
+        document.querySelector('#oper-divide').addEventListener('click', onClickButton);
+        document.querySelector('#oper-multiply').addEventListener('click', onClickButton);
+        document.querySelector('#oper-clear').addEventListener('click', onClickButton);
+        document.querySelector('#oper-calculate').addEventListener('click', onClickButton);
+        window.addEventListener("keyup", onKeyUp);
+
+    </script>
+</body>
