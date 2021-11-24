@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>틱택토</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        td {
+            border: 1px solid black;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const { body } = document;
+        const $table = document.createElement('table');
+        const $result = document.createElement('div');
+
+        const stadium = Array(3).fill().map(() => Array(3).fill());
+        const player = ['x', 'o'];
+        let turn = 1;
+
+        const checkWin = () => {
+            for(let i = 0; i < 3; i++){
+                const tempRow = [];
+                const tempCol = [];
+                for(let j = 0; j < 3; j++) {
+                    tempRow.push(stadium[i][j]);
+                    tempCol.push(stadium[j][i]);
+                }
+                if(tempRow.every((v) => v===turn)) return true;
+                if(tempCol.every((v) => v===turn)) return true;
+            }
+            const tempDiogonal0 = [];
+            const tempDiogonal1 = [];
+            
+            for(let i = 0; i < 3; i++){
+                tempDiogonal0.push(stadium[i][i]);
+                tempDiogonal1.push(stadium[2-i][i]);
+            }
+            if(tempDiogonal0.every((v) => v===turn)) return true;
+            if(tempDiogonal1.every((v) => v===turn)) return true;
+            return false;
+        }
+
+        const checkDraw = () => stadium.flat().every((v) => v !== undefined);
+
+        const onClickButton = (e) => {
+            console.log(e.target);
+            if (e.target.textContent !== '') return;
+            e.target.textContent = turn ? 'o' : 'x';
+            let curY = e.target.parentElement.rowIndex;
+            let curX = e.target.cellIndex;
+            stadium[curY][curX] = turn;
+            let bWin = checkWin();
+            let bDraw = checkDraw();
+            if(bWin || bDraw) handleGameOver(bWin);
+            turn = (turn + 1) % 2;
+        }
+        
+        const handleGameOver = (bWin) => {
+            const message = bWin? player[turn] + ' 플레이어 승리!' : ' 비겼습니다.'
+            $result.textContent = message;
+            $table.removeEventListener('click', onClickButton);
+        }
+
+        stadium.forEach(
+            (vRow) => {
+                const $tr = document.createElement('tr');
+                vRow.forEach((vCol) => {
+                    const $td = document.createElement('td');
+                    $tr.append($td);
+                })
+                $table.append($tr);
+            })
+        $table.addEventListener('click', onClickButton);
+        body.append($table);
+        body.append($result);
+    </script>
+</body>
+
+</html>
