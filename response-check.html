@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>반응속도</title>
+    <style>
+        #screen {
+            width: 300px;
+            height: 200px;
+            text-align: center;
+            user-select: none;
+        }
+
+        #screen.waiting {
+            background-color: aqua;
+        }
+
+        #screen.ready {
+            background-color: red;
+            color: white;
+        }
+
+        #screen.now {
+            background-color: greenyellow;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="screen" class="waiting">클릭해서 시작하세요</div>
+    <div id="result"></div>
+    <script>
+        const $screen = document.querySelector('#screen');
+        const $result = document.querySelector('#result');
+        let startTime;
+        let endTime;
+        let timeoutId;
+        const records = [];
+        const handleClickEvent = () => {
+            switch ($screen.className){
+                case 'waiting':
+                    $screen.className = 'ready';
+                    $screen.textContent = '초록색이 되면 클릭하세요';
+                    timeoutId = setTimeout(() => {
+                        $screen.className = 'now';
+                        $screen.textContent = '클릭하세요!';
+                        startTime = new Date();
+                    }, 1000 + Math.floor(Math.random()*1000));
+                    break;
+                case 'ready':
+                    clearTimeout(timeoutId);
+                    $screen.className = 'waiting';
+                    $screen.textContent = '너무 성급하시군요!';
+                    break;
+                case 'now' :
+                    endTime = new Date();
+                    const diff = endTime - startTime;
+                    records.push(diff);
+                    const average = (records.reduce((sum,c) => sum+c) / records.length).toFixed(2);
+                    $result.textContent = `현재 ${diff}ms, 평균 ${average}ms`;
+                    records.forEach((v,i) => {
+                        $result.append(
+                            document.createElement('br'),
+                            `${i + 1}번째 : ${records[i]}ms`,
+                        )
+                    })
+                    $screen.className = 'waiting';
+                    $screen.textContent = '클릭해서 시작하세요'
+                    break;
+
+            }
+        }
+
+        $screen.addEventListener('click',handleClickEvent);
+
+
+    </script>
+</body>
+
+</html>
