@@ -1,94 +1,155 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8" />
-<title>짝맞추기</title>
-<style>
-  .card {
-    display: inline-block;
-    margin-right: 20px;
-    margin-bottom: 20px;
-    width: 70px;
-    height: 100px;
-    perspective: 140px;
-  }
+  <meta charset="utf-8" />
+  <title>짝맞추기</title>
+  <style>
+    .card {
+      display: inline-block;
+      margin-right: 20px;
+      margin-bottom: 20px;
+      width: 70px;
+      height: 100px;
+      perspective: 140px;
+    }
 
-  .card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.8s;
-    transform-style: preserve-3d;
-  }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
 
-  .card.flipped .card-inner {
-    transform: rotateY(180deg);
-  }
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
 
-  .card-front {
-    background: navy;
-  }
+    .card-front {
+      background: navy;
+    }
 
-  .card-front, .card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 1px solid black;
-    backface-visibility: hidden;
-  }
+    .card-front,
+    .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 1px solid black;
+      backface-visibility: hidden;
+    }
 
-  .card-back {
-    transform: rotateY(180deg);
-  }
-</style>
+    .card-back {
+      transform: rotateY(180deg);
+    }
+  </style>
 </head>
+
 <body>
-<div id="wrapper"></div>
-<script>
-  const $wrapper = document.querySelector('#wrapper');
-  
-  const total = 12;
-  const colors = ['red', 'orange', 'yellow', 'green', 'white', 'pink'];
-  let copiedColors = colors.concat(colors);
-  let shuffled = [];
+  <div id="wrapper"></div>
+  <script>
+    const $wrapper = document.querySelector('#wrapper');
 
-  function suffle(){
-      for(let i = 0; copiedColors.length > 0; i++){
-          const idx = Math.floor(Math.random()*copiedColors.length);
-          shuffled = shuffled.concat(copiedColors.splice(idx,1));
+    const total = 12;
+    const colors = ['red', 'orange', 'yellow', 'green', 'white', 'pink'];
+    let copiedColors = colors.concat(colors);
+    let shuffled = [];
+    let picked = [];
+    let clickable = false;
+    let completed = [];
+
+    function suffle() {
+      for (let i = 0; copiedColors.length > 0; i++) {
+        const idx = Math.floor(Math.random() * copiedColors.length);
+        shuffled = shuffled.concat(copiedColors.splice(idx, 1));
       }
-  }
+    }
 
-  suffle();
+    function createCard(i) { // div.card > div.card-inner > (div.card-front + div.card-back)
+      const card = document.createElement('div');
+      card.className = 'card'; // .card 태그 생성
+      const cardInner = document.createElement('div');
+      cardInner.className = 'card-inner'; // .card-inner 태그 생성
+      const cardFront = document.createElement('div');
+      cardFront.className = 'card-front'; // .card-front 태그 생성
+      const cardBack = document.createElement('div');
+      cardBack.className = 'card-back'; // .card-back 태그 생성
+      cardBack.style.backgroundColor = shuffled[i];
+      cardInner.appendChild(cardFront);
+      cardInner.appendChild(cardBack);
+      card.appendChild(cardInner);
+      return card;
+    }
 
-  function createCard(i) { // div.card > div.card-inner > (div.card-front + div.card-back)
-    const card = document.createElement('div');
-    card.className = 'card'; // .card 태그 생성
-    const cardInner = document.createElement('div');
-    cardInner.className = 'card-inner'; // .card-inner 태그 생성
-    const cardFront = document.createElement('div');
-    cardFront.className = 'card-front'; // .card-front 태그 생성
-    const cardBack = document.createElement('div');
-    cardBack.className = 'card-back'; // .card-back 태그 생성
-    cardBack.style.backgroundColor = shuffled[i];
-    cardInner.appendChild(cardFront);
-    cardInner.appendChild(cardBack);
-    card.appendChild(cardInner);
-    return card;
-  }
-
-  for(let i = 0; i < total; i++) {
-    const card = createCard(i);
-    card.addEventListener('click',onClickCard);
-    $wrapper.appendChild(card);
-  }
-
+    function onClickCard() {
+      if(!clickable || picked[0] == this || completed.includes(this)) return;
+      picked.push(this);
+      this.classList.add('flipped');
+      console.log(this);
+      console.log(this.querySelector('.card-back').style.backgroundColor);
 
 
+      if(picked.length === 2){
+        clickable = false;
+        const firstColor = picked[0].querySelector('.card-back').style.backgroundColor;
+        const secondColor = picked[1].querySelector('.card-back').style.backgroundColor;
+        if(firstColor === secondColor){
+          completed.push(picked[0]);
+          completed.push(picked[1]);
+          picked = [];
+          clickable = true;
+          if(completed.length === total){
+            setTimeout(() => {
+              alert("축하합니다!");
+              resetGame();
+            })
+          }
+        }
+        else{
+          setTimeout(() => {
+            picked[0].classList.remove('flipped');
+            picked[1].classList.remove('flipped');
+            clickable = true;
+            picked = [];
+          },800);
+        }
+      }
+    }
 
+    function gameStart() {
+      suffle();
+      for (let i = 0; i < total; i++) {
+        const card = createCard(i);
+        card.addEventListener('click', onClickCard);
+        $wrapper.appendChild(card);
 
+        setTimeout(() => {
+          card.classList.add('flipped');
+        }, 0000 + i*100);
 
-</script>
+        setTimeout(() => {
+          card.classList.remove('flipped');
+        }, 3000 - i*100);
+
+        setTimeout(() => {
+          clickable = true;
+        });
+      }
+
+    }
+    function resetGame(){
+      
+      clickable = false;
+      copiedColors = colors.concat(colors);
+      console.log(copiedColors);
+      $wrapper.innerHTML = '';
+      shuffled = [];
+      completed = [];
+      gameStart();
+    }
+
+    gameStart();
+  </script>
 </body>
+
 </html>
