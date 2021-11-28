@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>짝맞추기</title>
+<style>
+  .card {
+    display: inline-block;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    width: 70px;
+    height: 100px;
+    perspective: 140px;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+  }
+
+  .card.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .card-front {
+    background: navy;
+  }
+
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 1px solid black;
+    backface-visibility: hidden;
+  }
+
+  .card-back {
+    transform: rotateY(180deg);
+  }
+</style>
+</head>
+<body>
+<div id="wrapper"></div>
+<script>
+  const $wrapper = document.querySelector('#wrapper');
+  
+  const total = 12;
+  const colors = ['red', 'orange', 'yellow', 'green', 'white', 'pink'];
+  let copiedColors = colors.concat(colors);
+  let shuffled = [];
+
+  function suffle(){
+      for(let i = 0; copiedColors.length > 0; i++){
+          const idx = Math.floor(Math.random()*copiedColors.length);
+          shuffled = shuffled.concat(copiedColors.splice(idx,1));
+      }
+  }
+
+  suffle();
+
+  function createCard(i) { // div.card > div.card-inner > (div.card-front + div.card-back)
+    const card = document.createElement('div');
+    card.className = 'card'; // .card 태그 생성
+    const cardInner = document.createElement('div');
+    cardInner.className = 'card-inner'; // .card-inner 태그 생성
+    const cardFront = document.createElement('div');
+    cardFront.className = 'card-front'; // .card-front 태그 생성
+    const cardBack = document.createElement('div');
+    cardBack.className = 'card-back'; // .card-back 태그 생성
+    cardBack.style.backgroundColor = shuffled[i];
+    cardInner.appendChild(cardFront);
+    cardInner.appendChild(cardBack);
+    card.appendChild(cardInner);
+    return card;
+  }
+
+  for(let i = 0; i < total; i++) {
+    const card = createCard(i);
+    card.addEventListener('click',onClickCard);
+    $wrapper.appendChild(card);
+  }
+
+
+
+
+
+
+</script>
+</body>
+</html>
